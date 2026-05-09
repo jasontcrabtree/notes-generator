@@ -1,1 +1,0 @@
-[{"title":"SwiftData vs Observable","description":"SwiftData persists model state, while Observable drives view invalidation for in-memory state.","tags":["swift","swiftdata","swiftui"],"url":"/notes/swiftdata-vs-observable/"}]

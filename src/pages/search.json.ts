@@ -13,7 +13,7 @@ export async function GET() {
         title: note.data.title,
         description: note.data.description,
         tags: note.data.tags,
-        url: `/notes/${note.slug}/`,
+        url: `/notes/${note.id}/`,
       })),
     ),
     {

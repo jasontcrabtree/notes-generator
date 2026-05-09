@@ -1,5 +1,5 @@
 ---
-import { type CollectionEntry, getCollection } from "astro:content";
+import { type CollectionEntry, getCollection, render } from "astro:content";
 import NoteLayout from "../../layouts/NoteLayout.astro";
 
 export const prerender = true;
@@ -9,7 +9,7 @@ export async function getStaticPaths() {
   return notes
     .filter((note) => !note.data.draft)
     .map((note) => ({
-      params: { slug: note.slug },
+      params: { slug: note.id },
       props: { note },
     }));
 }
@@ -19,7 +19,7 @@ type Props = {
 };
 
 const { note } = Astro.props;
-const { Content } = await note.render();
+const { Content } = await render(note);
 ---
 
 <NoteLayout frontmatter={note.data}>
