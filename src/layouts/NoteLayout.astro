@@ -1,0 +1,29 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+
+const { frontmatter } = Astro.props;
+---
+
+<BaseLayout title={`${frontmatter.title} | Notes`} description={frontmatter.description}>
+  <main class="prose">
+    <p class="meta">
+      {frontmatter.pubDate.toLocaleDateString("en-GB", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })}
+      · {frontmatter.source}
+    </p>
+    <h1>{frontmatter.title}</h1>
+    <p class="lede">{frontmatter.description}</p>
+    <p class="source-link">
+      <a href={frontmatter.sourceUrl} rel="noopener noreferrer" target="_blank">
+        Definitive source
+      </a>
+    </p>
+    <div class="tags">
+      {frontmatter.tags.map((tag: string) => <span class="tag">{tag}</span>)}
+    </div>
+    <slot />
+  </main>
+</BaseLayout>

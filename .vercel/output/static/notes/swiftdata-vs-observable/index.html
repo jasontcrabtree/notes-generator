@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="description" content="SwiftData persists model state, while Observable drives view invalidation for in-memory state."><meta name="robots" content="noindex, nofollow"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SwiftData vs Observable | Notes</title><link rel="stylesheet" href="/_astro/_slug_.BsvqkwPH.css"><script type="module" src="/_astro/hoisted.BW51SguU.js"></script></head> <body>  <header class="site-header"> <div class="site-header__inner"> <a class="brand" href="/">Notes</a> <nav class="nav" aria-label="Main navigation"> <a href="/">Notes</a> <a href="/new">New</a> </nav> <div class="site-search" role="search"> <label class="site-search__label" for="note-search">Search</label> <input id="note-search" name="notes_query" type="text" inputmode="search" autocomplete="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other" placeholder="Find a note"> <div class="site-search__results" id="note-search-results" hidden></div> </div> </div> </header>  <main class="prose"> <p class="meta"> 9 May 2026
+· manual </p> <h1>SwiftData vs Observable</h1> <p class="lede">SwiftData persists model state, while Observable drives view invalidation for in-memory state.</p> <p class="source-link"> <a href="https://developer.apple.com/documentation/SwiftData" rel="noopener noreferrer" target="_blank">
+Definitive source
+</a> </p> <div class="tags"> <span class="tag">swift</span><span class="tag">swiftdata</span><span class="tag">swiftui</span> </div>  <h2 id="short-version">Short Version</h2>
+<p><code>SwiftData</code> is for persistence. <code>@Observable</code> is for UI state propagation.</p>
+<p>If the object needs to survive app launches, participate in queries, or be stored
+in a model context, make it a SwiftData model. If the object describes temporary
+screen state, coordination state, or a service-like object that SwiftUI should
+react to, make it observable.</p>
+<h2 id="mental-model">Mental Model</h2>
+<p>Use <code>@Model</code> when the object is part of your app’s data graph.</p>
+<p>Use <code>@Observable</code> when the object is part of your app’s runtime behavior.</p>
+<p>The overlap is that both can cause SwiftUI views to update, but they are solving
+different problems. Treating SwiftData as a general state-management system tends
+to make transient UI behavior harder to reason about.</p>
+<h2 id="code-example">Code Example</h2>
+<pre class="astro-code github-dark" style="background-color:#24292e;color:#e1e4e8;overflow-x:auto" tabindex="0" data-language="swift"><code><span class="line"><span style="color:#F97583">@Observable</span></span>
+<span class="line"><span style="color:#F97583">final</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> EditorState</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> selectedID: UUID</span><span style="color:#F97583">?</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> isInspectorVisible </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">@Model</span></span>
+<span class="line"><span style="color:#F97583">final</span><span style="color:#F97583"> class</span><span style="color:#B392F0"> Note</span><span style="color:#E1E4E8"> {</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> title: </span><span style="color:#79B8FF">String</span></span>
+<span class="line"><span style="color:#F97583">    var</span><span style="color:#E1E4E8"> body: </span><span style="color:#79B8FF">String</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">    init</span><span style="color:#E1E4E8">(</span><span style="color:#B392F0">title</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">String</span><span style="color:#E1E4E8">, </span><span style="color:#B392F0">body</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">String</span><span style="color:#E1E4E8">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.title </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> title</span></span>
+<span class="line"><span style="color:#79B8FF">        self</span><span style="color:#E1E4E8">.body </span><span style="color:#F97583">=</span><span style="color:#E1E4E8"> body</span></span>
+<span class="line"><span style="color:#E1E4E8">    }</span></span>
+<span class="line"><span style="color:#E1E4E8">}</span></span>
+<span class="line"></span></code></pre>  </main>  <aside class="ai-banner" id="ai-banner" hidden> <p>All Notes are AI-generated for the purpose of technical references</p> <button class="ai-banner__dismiss" id="ai-banner-dismiss" type="button" aria-label="Dismiss AI note notice">
+&times;
+</button> </aside>   </body></html>

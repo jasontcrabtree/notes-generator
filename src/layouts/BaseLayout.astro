@@ -1,0 +1,155 @@
+---
+import "../styles/global.css";
+
+const { title = "Notes", description = "Short technical notes distilled from real questions." } =
+  Astro.props;
+const themeParam = Astro.url.searchParams.get("theme");
+const theme =
+  themeParam === "blueprint" || themeParam === "salon" || themeParam === "mono"
+    ? themeParam
+    : undefined;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+  </head>
+  <body data-theme={theme}>
+    <script>
+      const theme = new URLSearchParams(window.location.search).get("theme");
+      if (theme === "blueprint" || theme === "salon" || theme === "mono") {
+        document.body.dataset.theme = theme;
+      }
+    </script>
+    <header class="site-header">
+      <div class="site-header__inner">
+        <a class="brand" href="/">Notes</a>
+        <nav class="nav" aria-label="Main navigation">
+          <a href="/">Notes</a>
+          <a href="/new">New</a>
+        </nav>
+        <div class="site-search" role="search">
+          <label class="site-search__label" for="note-search">Search</label>
+          <input
+            id="note-search"
+            name="notes_query"
+            type="text"
+            inputmode="search"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            data-lpignore="true"
+            data-1p-ignore="true"
+            data-form-type="other"
+            placeholder="Find a note"
+          />
+          <div class="site-search__results" id="note-search-results" hidden></div>
+        </div>
+      </div>
+    </header>
+    <slot />
+    <aside class="ai-banner" id="ai-banner" hidden>
+      <p>All Notes are AI-generated for the purpose of technical references</p>
+      <button class="ai-banner__dismiss" id="ai-banner-dismiss" type="button" aria-label="Dismiss AI note notice">
+        &times;
+      </button>
+    </aside>
+    <script>
+      // @ts-nocheck
+      const banner = document.getElementById("ai-banner");
+      const dismiss = document.getElementById("ai-banner-dismiss");
+      const storageKey = "notes-ai-banner-dismissed";
+
+      if (banner && localStorage.getItem(storageKey) !== "true") {
+        banner.hidden = false;
+      }
+
+      dismiss?.addEventListener("click", () => {
+        localStorage.setItem(storageKey, "true");
+        if (banner) banner.hidden = true;
+      });
+
+      document.querySelectorAll("pre").forEach((pre) => {
+        const wrapper = document.createElement("div");
+        const button = document.createElement("button");
+        const code = pre.querySelector("code");
+
+        wrapper.className = "code-block";
+        button.className = "code-copy";
+        button.type = "button";
+        button.textContent = "Copy";
+        button.addEventListener("click", async () => {
+          await navigator.clipboard.writeText(code?.textContent ?? pre.textContent ?? "");
+          button.textContent = "Copied";
+          window.setTimeout(() => {
+            button.textContent = "Copy";
+          }, 1400);
+        });
+
+        pre.parentNode?.insertBefore(wrapper, pre);
+        wrapper.append(button, pre);
+      });
+
+      const searchInput = document.getElementById("note-search");
+      const searchResults = document.getElementById("note-search-results");
+      let searchIndex = [];
+
+      async function loadSearchIndex() {
+        if (searchIndex.length) return searchIndex;
+        const response = await fetch("/search.json");
+        searchIndex = await response.json();
+        return searchIndex;
+      }
+
+      function closeSearch() {
+        if (searchResults) {
+          searchResults.hidden = true;
+          searchResults.innerHTML = "";
+        }
+      }
+
+      searchInput?.addEventListener("input", async (event) => {
+        const query = event.currentTarget.value.trim().toLowerCase();
+        if (!query || !searchResults) {
+          closeSearch();
+          return;
+        }
+
+        const notes = await loadSearchIndex();
+        const matches = notes
+          .filter((note) =>
+            [note.title, note.description, ...(note.tags || [])]
+              .join(" ")
+              .toLowerCase()
+              .includes(query),
+          )
+          .slice(0, 6);
+
+        searchResults.hidden = false;
+        searchResults.innerHTML = matches.length
+          ? matches
+              .map(
+                (note) => `
+                  <a class="site-search__result" href="${note.url}">
+                    <strong>${note.title}</strong>
+                    <span>${note.description}</span>
+                  </a>
+                `,
+              )
+              .join("")
+          : '<p class="site-search__empty">No notes found.</p>';
+      });
+
+      document.addEventListener("click", (event) => {
+        if (!event.target.closest?.(".site-search")) {
+          closeSearch();
+        }
+      });
+    </script>
+  </body>
+</html>
