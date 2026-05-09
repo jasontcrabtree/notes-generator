@@ -1,28 +1,123 @@
 ---
-title: "Commonly Used SwiftUI Modifiers"
-description: "A list of widely used SwiftUI modifiers for UI development categorized by purpose."
+title: 'Commonly Used SwiftUI Modifiers'
+description: 'A list of widely used SwiftUI modifiers for UI development categorized by purpose.'
 pubDate: 2026-05-09
-tags: ["SwiftUI", "modifiers", "iOS"]
-source: "chatgpt"
-sourceTitle: "Apple Developer Documentation"
-sourceUrl: "https://developer.apple.com/documentation/swiftui/view"
+tags: ['SwiftUI', 'modifiers', 'iOS']
+source: 'chatgpt'
+sourceTitle: 'Apple Developer Documentation'
+sourceUrl: 'https://developer.apple.com/documentation/swiftui/view'
 draft: false
 ---
 
 ## Short Version
-SwiftUI provides a variety of modifiers that can be applied to views to alter their layout, style, and behavior. These modifiers can be grouped into categories such as layout, text styling, backgrounds, and interaction.
+
+This document outlines a list of commonly used SwiftUI modifiers, categorized by their purpose in layout, text styling, backgrounds, interaction, and more.
 
 ## Mental Model
-Modifiers in SwiftUI act as transformations to views, returning new views as a result. The order of modifiers is significant, as each modifier wraps the previously modified view, affecting the layout and appearance.
+
+In SwiftUI, modifiers serve as "view transforms," which mean each modifier applies a transformation to the view in a chain. The order of modifiers is significant as each one wraps the previous view, affecting how properties and layout are applied.
 
 ## Code Example
+
 ```swift
 Text("Hello")
     .padding()
     .background(.blue)
-
-Text("Hello")
-    .background(.blue)
-    .padding()
 ```
-These examples illustrate how the order of modifiers changes the layout of the views.
+
+This results in a text with padding surrounding it and a blue background.
+
+## Long Version
+
+### Layout & Spacing
+
+- `.padding()`
+- `.padding(.horizontal, 16)`
+- `.padding(.vertical, 8)`
+- `.frame(width: 100, height: 50)`
+- `.frame(maxWidth: .infinity)`
+- `.offset(x: 10, y: 20)`
+- `.position(x: 100, y: 200)`
+- `.spacer()`
+- `.safeAreaPadding()`
+- `.ignoresSafeArea()`
+
+### Text Styling
+
+- `.font(.title)`
+- `.font(.headline)`
+- `.font(.system(size: 24))`
+- `.fontWeight(.bold)`
+- `.fontWeight(.black)`
+- `.foregroundStyle(.white)`
+- `.foregroundStyle(.blue)`
+- `.multilineTextAlignment(.center)`
+- `.lineLimit(2)`
+- `.minimumScaleFactor(0.8)`
+- `.italic()`
+- `.underline()`
+- `.strikethrough()`
+
+### Backgrounds & Shapes
+
+- `.background(.blue)`
+- `.background(RoundedRectangle(cornerRadius: 12).fill(.blue))`
+- `.clipShape(.capsule)`
+- `.clipShape(RoundedRectangle(cornerRadius: 16))`
+- `.cornerRadius(12)`
+- `.overlay(RoundedRectangle(cornerRadius: 12).stroke(.white, lineWidth: 2))`
+- `.shadow(radius: 10)`
+- `.opacity(0.7)`
+
+### Images
+
+- `.resizable()`
+- `.scaledToFit()`
+- `.scaledToFill()`
+- `.aspectRatio(contentMode: .fit)`
+- `.frame(width: 100, height: 100)`
+- `.clipped()`
+
+### Buttons & Interaction
+
+- `.buttonStyle(.bordered)`
+- `.buttonStyle(.borderedProminent)`
+- `.tint(.blue)`
+- `.disabled(true)`
+- `.onTapGesture {}`
+- `.sheet(isPresented: $showingSheet) {}`
+- `.alert("Title", isPresented: $showingAlert) {}`
+
+### Stacks & Alignment
+
+- `VStack(alignment: .leading, spacing: 12)`
+- `HStack(spacing: 20)`
+- `ZStack(alignment: .topTrailing)`
+
+### Animation
+
+- `.animation(.easeInOut, value: isExpanded)`
+- `.transition(.slide)`
+- `.transition(.opacity)`
+- `.withAnimation {}`
+
+### Lists & Scroll Views
+
+- `.listStyle(.plain)`
+- `.scrollIndicators(.hidden)`
+- `.refreshable {}`
+
+### Navigation
+
+- `.navigationTitle("Home")`
+- `.navigationBarTitleDisplayMode(.inline)`
+- `.toolbar {}`
+
+### Data / State Related
+
+- `.onAppear {}`
+- `.onDisappear {}`
+- `.task {}`
+- `.refreshable {}`
+
+Each modifier provides specific functionality to the view it is called upon, and combining them effectively creates complex interfaces.
