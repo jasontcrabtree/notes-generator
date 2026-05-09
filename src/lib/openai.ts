@@ -8,9 +8,17 @@ const DraftSchema = z.object({
   description: z.string(),
   tags: z.array(z.string()).max(6),
   sourceTitle: z.string(),
-  sourceUrl: z.string().url(),
+  sourceUrl: z.string(),
   body: z.string(),
 });
+
+function normalizeUrl(value: string) {
+  try {
+    return new URL(value).toString();
+  } catch {
+    return "https://www.google.com/search?q=" + encodeURIComponent(value || "technical documentation");
+  }
+}
 
 export async function createDraft(input: {
   question: string;
@@ -57,7 +65,7 @@ export async function createDraft(input: {
     tags: parsed.tags,
     source: input.source,
     sourceTitle: parsed.sourceTitle,
-    sourceUrl: parsed.sourceUrl,
+    sourceUrl: normalizeUrl(parsed.sourceUrl),
     body: parsed.body,
   };
 }
