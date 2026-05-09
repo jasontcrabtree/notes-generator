@@ -2,18 +2,21 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 
-const notes = (await getCollection("notes"))
+const selectedTag = Astro.url.searchParams.get("tag");
+const allNotes = (await getCollection("notes"))
   .filter((note) => !note.data.draft)
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+const notes = selectedTag
+  ? allNotes.filter((note) => note.data.tags.includes(selectedTag))
+  : allNotes;
 ---
 
 <BaseLayout>
   <main>
-    <h1 class="page-title">Questions, distilled.</h1>
-    <p class="lede">
-      Short technical notes shaped from real learning questions. No chat transcripts,
-      just the durable bit worth finding again.
-    </p>
+    <header class="catalogue-head">
+      {selectedTag && <p class="catalogue-kicker">Tag: {selectedTag}</p>}
+      <h1 class="page-title">Notes</h1>
+    </header>
 
     <section class="note-list" aria-label="Notes">
       {
@@ -32,7 +35,7 @@ const notes = (await getCollection("notes"))
             <p>{note.data.description}</p>
             <div class="tags">
               {note.data.tags.map((tag) => (
-                <span class="tag">{tag}</span>
+                <a class="tag" href={`/?tag=${encodeURIComponent(tag)}`}>{tag}</a>
               ))}
             </div>
           </article>

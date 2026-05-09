@@ -4,13 +4,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
 <BaseLayout title="New note | Notes" description="Create a new distilled learning note.">
   <main class="admin-shell">
-    <h1 class="page-title">New note</h1>
-    <p class="lede">
-      Paste a ChatGPT shared link, copied conversation text, or both. Distill it,
-      edit the note, then publish to GitHub.
-    </p>
+    <h1 class="admin-title">New note</h1>
 
-    <section id="login-panel" class="panel" hidden>
+    <section id="login-panel" class="panel login-panel" hidden>
       <label>
         Admin password
         <input id="password" type="password" autocomplete="current-password" />
@@ -20,59 +16,56 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     </section>
 
     <section id="admin-panel" class="admin-grid" hidden>
-      <form class="panel" id="source-form">
-        <label>
-          ChatGPT shared link
+      <form class="panel input-panel" id="source-form">
+        <input id="source" type="hidden" value="chatgpt" />
+        <div class="segmented" role="group" aria-label="Input mode">
+          <button class="segment active" id="question-mode" type="button" data-mode="question">Question</button>
+          <button class="segment" id="link-mode" type="button" data-mode="link">Shared link</button>
+        </div>
+        <label id="share-label" hidden>
+          Shared link
           <input id="share-url" type="url" placeholder="https://chatgpt.com/share/..." />
         </label>
         <label>
-          Source
-          <select id="source">
-            <option value="chatgpt">ChatGPT</option>
-            <option value="codex">Codex</option>
-            <option value="manual">Manual</option>
-          </select>
+          Input
+          <textarea id="question" placeholder="Paste the question or copied ChatGPT text."></textarea>
         </label>
-        <label>
-          Question
-          <textarea id="question" placeholder="Paste the copied ChatGPT text or the question you asked."></textarea>
-        </label>
-        <label>
+        <label class="visually-hidden">
           Extra context
-          <textarea id="answer" placeholder="Optional: add constraints, corrections, links, or notes."></textarea>
+          <textarea id="answer"></textarea>
         </label>
-        <div class="button-row">
-          <button id="draft-button" type="submit">Distill draft</button>
-          <button class="secondary" id="clear-button" type="button">Clear</button>
-        </div>
+        <button id="draft-button" type="submit">Save</button>
         <p id="draft-status" class="status"></p>
       </form>
 
-      <form class="panel" id="publish-form">
-        <label>
-          Title
-          <input id="title" required />
-        </label>
-        <label>
-          Slug
-          <input id="slug" required />
-        </label>
-        <label>
-          Description
-          <textarea id="description" required></textarea>
-        </label>
-        <label>
-          Tags
-          <input id="tags" placeholder="swift, swiftdata, swiftui" />
-        </label>
-        <label>
-          Definitive source title
-          <input id="source-title" required />
-        </label>
-        <label>
-          Definitive source URL
-          <input id="source-url" type="url" required />
-        </label>
+      <form class="panel output-panel" id="publish-form">
+        <details class="defaults-box">
+          <summary>Defaults</summary>
+          <label>
+            Title
+            <input id="title" required />
+          </label>
+          <label>
+            Slug
+            <input id="slug" required />
+          </label>
+          <label>
+            Description
+            <textarea id="description" required></textarea>
+          </label>
+          <label>
+            Tags
+            <input id="tags" placeholder="swift, swiftdata, swiftui" />
+          </label>
+          <label>
+            Definitive source title
+            <input id="source-title" required />
+          </label>
+          <label>
+            Definitive source URL
+            <input id="source-url" type="url" required />
+          </label>
+        </details>
         <label>
           MDX body
           <textarea id="body" required></textarea>
@@ -93,6 +86,16 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   const loginStatus = $("login-status");
   const draftStatus = $("draft-status");
   const publishStatus = $("publish-status");
+
+  function setInputMode(mode) {
+    const isLink = mode === "link";
+    $("share-label").hidden = !isLink;
+    $("question-mode").classList.toggle("active", !isLink);
+    $("link-mode").classList.toggle("active", isLink);
+    $("question").placeholder = isLink
+      ? "Optional: paste copied conversation text too."
+      : "Paste the question or copied ChatGPT text.";
+  }
 
   function setDraft(draft) {
     $("title").value = draft.title || "";
@@ -144,10 +147,13 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     }
   });
 
+  $("question-mode").addEventListener("click", () => setInputMode("question"));
+  $("link-mode").addEventListener("click", () => setInputMode("link"));
+
   $("source-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     $("draft-button").disabled = true;
-    draftStatus.textContent = "Distilling...";
+    draftStatus.textContent = "Saving...";
     draftStatus.className = "status";
 
     try {
@@ -158,7 +164,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
         answer: $("answer").value,
       });
       setDraft(data.draft);
-      draftStatus.textContent = "Draft ready. Give it a quick editorial pass.";
+      draftStatus.textContent = "Saved.";
     } catch (error) {
       draftStatus.textContent = error.message;
       draftStatus.className = "status error";
@@ -170,7 +176,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
   $("publish-form").addEventListener("submit", async (event) => {
     event.preventDefault();
     $("publish-button").disabled = true;
-    publishStatus.textContent = "Publishing to GitHub...";
+    publishStatus.textContent = "Publishing...";
     publishStatus.className = "status";
 
     try {
@@ -194,7 +200,7 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 
       const url = data.result.commitUrl || data.result.htmlUrl;
       publishStatus.innerHTML = url
-        ? `Published. <a href="${url}">View GitHub commit</a>.`
+        ? `Published. <a href="${url}">View commit</a>.`
         : "Published.";
     } catch (error) {
       publishStatus.textContent = error.message;
@@ -204,12 +210,6 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
     }
   });
 
-  $("clear-button").addEventListener("click", () => {
-    $("share-url").value = "";
-    $("question").value = "";
-    $("answer").value = "";
-    setDraft({ title: "", slug: "", description: "", tags: [], sourceTitle: "", sourceUrl: "", body: "" });
-  });
-
+  setInputMode("question");
   refreshSession();
 </script>

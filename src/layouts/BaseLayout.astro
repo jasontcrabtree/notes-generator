@@ -17,6 +17,7 @@ const theme =
     <meta name="description" content={description} />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <title>{title}</title>
   </head>
   <body data-theme={theme}>
@@ -26,33 +27,36 @@ const theme =
         document.body.dataset.theme = theme;
       }
     </script>
-    <header class="site-header">
-      <div class="site-header__inner">
-        <a class="brand" href="/">Notes</a>
-        <nav class="nav" aria-label="Main navigation">
-          <a href="/">Notes</a>
-          <a href="/new">New</a>
-        </nav>
-        <div class="site-search" role="search">
-          <label class="site-search__label" for="note-search">Search</label>
-          <input
-            id="note-search"
-            name="notes_query"
-            type="text"
-            inputmode="search"
-            autocomplete="off"
-            autocapitalize="off"
-            spellcheck="false"
-            data-lpignore="true"
-            data-1p-ignore="true"
-            data-form-type="other"
-            placeholder="Find a note"
-          />
-          <div class="site-search__results" id="note-search-results" hidden></div>
+    <div class="app-frame">
+      <header class="site-header">
+        <div class="site-header__inner">
+          <a class="brand" href="/">Notes</a>
+          <div class="site-search" role="search">
+            <label class="site-search__label" for="note-search">Search</label>
+            <input
+              id="note-search"
+              name="notes_query"
+              type="text"
+              inputmode="search"
+              autocomplete="off"
+              autocapitalize="off"
+              spellcheck="false"
+              data-lpignore="true"
+              data-1p-ignore="true"
+              data-form-type="other"
+              placeholder="Find a note"
+            />
+            <div class="site-search__results" id="note-search-results" hidden></div>
+          </div>
+          <a class="new-note-link" href="/new" aria-label="New note">
+            <svg aria-hidden="true" viewBox="0 0 24 24">
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </a>
         </div>
-      </div>
-    </header>
-    <slot />
+      </header>
+      <slot />
+    </div>
     <aside class="ai-banner" id="ai-banner" hidden>
       <p>All Notes are AI-generated for the purpose of technical references</p>
       <button class="ai-banner__dismiss" id="ai-banner-dismiss" type="button" aria-label="Dismiss AI note notice">
