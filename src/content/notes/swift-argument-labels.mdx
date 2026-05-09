@@ -1,0 +1,26 @@
+---
+title: "Swift Argument Labels"
+description: "Understanding the use of argument labels in Swift function definitions."
+pubDate: 2026-05-09
+tags: ["Swift", "Function", "Argument Label"]
+source: "chatgpt"
+sourceTitle: "Swift Programming Language - Functions"
+sourceUrl: "https://docs.swift.org/swift-book/LanguageGuide/Functions.html#ID104"
+draft: false
+---
+
+## Short Version
+In Swift, the `for` in a function signature (e.g., `func image(for number: Int) -> Image`) is an external parameter name, which serves to enhance the readability of function calls and is not related to loops or control structures.
+
+## Mental Model
+Each function parameter can have an external name (the name used when calling the function) and an internal name (the name used within the function). For example, in `image(for number: Int)`, `for` is external and intended for clarity in call sites (e.g., `image(for: 3)`), while `number` is the internal name. This design allows Swift to create more human-readable API calls while maintaining flexibility in underlying implementation.
+
+## Code Example
+```swift
+func image(for number: Int) -> Image {
+    return number > rating ? offImage ?? onImage : onImage
+}
+
+let result = image(for: 3)
+```
+This code demonstrates function definition with an external label and its call. The `for` enhances readability at the call site.
