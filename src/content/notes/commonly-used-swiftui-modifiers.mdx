@@ -1,0 +1,28 @@
+---
+title: "Commonly Used SwiftUI Modifiers"
+description: "A list of widely used SwiftUI modifiers for UI development categorized by purpose."
+pubDate: 2026-05-09
+tags: ["SwiftUI", "modifiers", "iOS"]
+source: "chatgpt"
+sourceTitle: "Apple Developer Documentation"
+sourceUrl: "https://developer.apple.com/documentation/swiftui/view"
+draft: false
+---
+
+## Short Version
+SwiftUI provides a variety of modifiers that can be applied to views to alter their layout, style, and behavior. These modifiers can be grouped into categories such as layout, text styling, backgrounds, and interaction.
+
+## Mental Model
+Modifiers in SwiftUI act as transformations to views, returning new views as a result. The order of modifiers is significant, as each modifier wraps the previously modified view, affecting the layout and appearance.
+
+## Code Example
+```swift
+Text("Hello")
+    .padding()
+    .background(.blue)
+
+Text("Hello")
+    .background(.blue)
+    .padding()
+```
+These examples illustrate how the order of modifiers changes the layout of the views.
