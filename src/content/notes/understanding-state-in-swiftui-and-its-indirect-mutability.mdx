@@ -1,0 +1,65 @@
+---
+title: "Understanding @State in SwiftUI and Its Indirect Mutability"
+description: "Explains the unique mutability model of @State properties in SwiftUI as structs and value types, differentiating from standard Swift property behavior."
+pubDate: 2026-05-14
+tags: ["SwiftUI", "@State", "Structs", "Value Types"]
+source: "chatgpt"
+sourceTitle: "Hacking with Swift Forum"
+sourceUrl: "https://www.hackingwithswift.com/forums/iOS-Development/understanding-state-in-swiftui"
+draft: false
+---
+
+## Short Version
+In SwiftUI, `@State` is used to manage mutable state in a `struct` which is a value type. Unlike normal struct properties that are directly mutable, changes to `@State` properties are managed by SwiftUI's framework, bypassing the typical mutability flow and property observers, such as `didSet`. Instead, the `onChange()` modifier should be used to react to changes in these properties.
+
+## Mental Model
+SwiftUI views are fundamentally lightweight value types, which means they are recreated on each render. If mutable state were stored directly in structs, every redraw would reset those values. The `@State` property wrapper stores the actual mutable state outside the view struct in SwiftUI’s environment, allowing the view to maintain its state across redraws. This leads to efficient tracking of dependencies and declarative UI updates but requires a different approach for mutations, using binding APIs or modifiers without the standard property observer behavior.  
+
+Conceptually, `@State` behaves more like a reference to SwiftUI's storage rather than a typical struct property. 
+
+## Code Example
+```swift
+struct ContentView: View {
+    @State private var blurAmount = 0.0 // State variable
+
+    var body: some View {
+        VStack {
+            Text("Hello, World!")
+                .blur(radius: blurAmount)
+            Slider(value: $blurAmount, in: 0...20)
+                .onChange(of: blurAmount) { oldValue, newValue in
+                    print("New value is \(newValue)")
+                }
+        }
+    }
+}
+```
+
+## Long Version
+In Swift, a `struct` is a value type, meaning that when you assign it or pass it to a function, a copy is created. Each instance of the `struct` operates independently. For example:
+```swift
+struct Counter {
+    var count = 0
+}
+var counter = Counter()
+counter.count += 1  // This modifies only the local instance
+```
+In this context, property observers like `didSet` work as expected because mutations happen directly on the instance of the struct.
+
+However, for SwiftUI, views are designed to be ephemeral and lightweight. When declaring a SwiftUI view:
+```swift
+struct ContentView: View {
+    ...
+}
+```
+These structs are not only recreated multiple times during rendering but should remain minimal. If state was held within the struct, every time SwiftUI redraws the view, the data would revert to defaults, making mutable state unreliable.  
+
+`@State` addresses this issue. It effectively decouples the mutable state from the struct while keeping a reference to the state in SwiftUI's managed environment. This means that:
+1. The UI can safely redraw without losing state information.
+2. SwiftUI can optimize rendering and efficiently trigger updates when state changes.
+
+However, this design brings limitations:
+- Property observers like `didSet` do not behave as expected because mutating `@State` properties is managed by SwiftUI's rendering cycle, not directly by the struct.
+- The mutation of state must occur through the provided APIs and bindings, which allows SwiftUI to maintain control over the rendering lifecycle.
+
+The mental model thus becomes: SwiftUI view structs are lightweight descriptions of the UI, while `@State` represents persistent storage of mutable state. This separation allows for predictable UI behavior that aligns with declarative programming paradigms while leveraging Swift’s value type characteristics.
