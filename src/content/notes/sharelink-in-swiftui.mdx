@@ -1,0 +1,84 @@
+---
+title: "ShareLink in SwiftUI"
+description: "A SwiftUI view for presenting the system share sheet to users, facilitating sharing content across various applications."
+pubDate: 2026-05-27
+tags: ["SwiftUI", "ShareLink", "Transferable", "iOS", "macOS"]
+source: "chatgpt"
+sourceTitle: "Apple Developer Documentation"
+sourceUrl: "https://developer.apple.com/documentation/swiftui/sharelink"
+draft: false
+---
+
+## Short Version
+`ShareLink` is a SwiftUI component that allows you to create a share button in your app, enabling users to share content via the system share interface, such as Messages, Mail, and AirDrop.
+
+## Mental Model
+Think of `ShareLink` as a button that hands over the data for sharing to the operating system's sharing framework. You decide:
+- What data to share
+- Optionally, provide a custom label, preview content, a subject, and a message
+The system takes care of presenting the UI and handling the data transfer.
+
+## Code Example
+```swift
+ShareLink(item: URL(string: "https://apple.com")!)
+```
+This code creates a standard share button that passes the specified URL to the system share sheet.
+
+## Long Version
+`ShareLink` is a powerful SwiftUI view designed to allow users to share various kinds of data from your app seamlessly. It is particularly useful for sharing:
+- URLs
+- Text strings
+- Custom data types that conform to the `Transferable` protocol.
+
+### Basic Usage
+When you use a `ShareLink`, you define the item to share:
+```swift
+ShareLink(item: URL(string: "https://example.com")!)
+```
+This creates a button that, when clicked, opens the iOS share sheet with the provided URL, listing compatible apps for sharing.
+
+### Customizing the Appearance
+You can customize the share link’s appearance by using a trailing closure to define a custom label:
+```swift
+ShareLink(item: URL(string: "https://example.com")!) {
+    Label("Share Article", systemImage: "square.and.arrow.up")
+}
+```
+### Understanding Transferable Types
+The `Transferable` protocol underpins the share functionality. To share a custom data type, such as:
+```swift
+struct Photo {
+    let image: Image
+    let caption: String
+}
+```
+You must conform to `Transferable` to define how the data is represented when shared. The documentation provides guidance on using `ProxyRepresentation` to assist in sharing complex types.
+
+### Working with Previews
+`ShareLink` allows you to customize the preview that appears in the share sheet:
+```swift
+ShareLink(item: photo, preview: SharePreview("Beach Sunset", image: photo.image))
+```
+### Additional Parameters
+You can also set optional `subject` and `message` parameters, which can provide more context for the sharing apps where allowed. For example:
+```swift
+ShareLink(item: photo, subject: Text("Cool Photo"), message: Text("Check it out!"))
+```
+### Sharing Multiple Items
+To share multiple items at once, use:
+```swift
+ShareLink(items: photos)
+```
+### Common Confusions
+- **Why isn’t this a Button?**: `ShareLink` contains specialized sharing behavior that separates it from a traditional button.
+- **Why does my custom struct not work?**: Custom structs must conform to `Transferable` to be shared properly.
+- **Why the many initializers?**: The various initializers provide flexibility for different share scenarios, though most users will typically use a couple of common forms.
+
+In practice, most applications will only require the simplest forms of `ShareLink`, such as:
+```swift
+ShareLink(item:) 
+// or 
+ShareLink(item:) {
+    Label(...)
+}
+```
